@@ -28,7 +28,7 @@ export const generateAiReply = async (message) => {
 
             Always introduce yourself as:
             "${modelName}"
-                
+                    
             `,
       },
       {
