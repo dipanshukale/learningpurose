@@ -9,7 +9,6 @@ export const generateAiReply = async (message) => {
   }
 
   const restaurantInfo = await findRestaurantInfo();
-
   const modelName = "Welcome to Spice Garden Personal Assitant";
 
   const completion = await groq.chat.completions.create({
