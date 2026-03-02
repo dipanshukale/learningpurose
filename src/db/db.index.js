@@ -10,6 +10,6 @@ export const connectDB = async()=> {
         console.log(`MongoDB connected : ${conn.connection.host}`);
     } catch (error) {
         console.log(error);
-        throw new ApiError(400,"MongoDB error occured",error);
+        process.exit(1);
     }
 };

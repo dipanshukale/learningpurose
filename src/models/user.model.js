@@ -1,9 +1,9 @@
 import mongoose from "mongoose";
+import dotenv from "dotenv";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import dotenv  from "dotenv";
 
-config.dotenv();
+dotenv.config();
 
 const userSchema = new mongoose.Schema(
     {   
@@ -28,6 +28,7 @@ const userSchema = new mongoose.Schema(
         },
         phone:{
             type:String,
+            required:true,
             trim:true
         },
         address:{
@@ -54,10 +55,10 @@ const userSchema = new mongoose.Schema(
     {timestamps:true}
 );
 
-userSchema.pre("save", async function(next){
-    if(!this.isModified("password")) return next();
+userSchema.pre("save", async function () {
+    if(!this.isModified("password")) return;
+
     this.password = await bcrypt.hash(this.password,10);
-    next();
 });
 
 userSchema.methods.ispasswordCorrect = async function(password){
@@ -83,7 +84,7 @@ userSchema.methods.generateRefreshToken = function(){
         _id:this._id,
     },
 
-    process.env.ACCESS_TOKEN_SECRET,
+    process.env.REFRESH_TOKEN_SECRET,
     {
         expiresIn: process.env.REFRESH_TOKEN_EXPIRY
     }
@@ -92,4 +93,4 @@ userSchema.methods.generateRefreshToken = function(){
 
 
 
-export const user = mongoose.model("user",userSchema);
+export const User = mongoose.model("User",userSchema);

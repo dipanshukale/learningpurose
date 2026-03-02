@@ -7,7 +7,7 @@ export const createRestaurantService = async(data) => {
         throw new ApiError(400,"Restaurant name is required");
     };
 
-    if(data.email && !/^\S+@\S+\.\S+$/.test(data.email)){
+    if(!data.email && !/^\S+@\S+\.\S+$/.test(data.email)){
         throw new ApiError(400,"Email is required");
     };
 
