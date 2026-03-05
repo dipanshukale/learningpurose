@@ -1,5 +1,7 @@
-import { User } from "../models/user.model.js";
+import User  from "../models/user.model.js";
 import ApiError from "../utils/ApiError.js";
+import { getVectorStore } from "./vector.service.js";
+import { Document } from "@langchain/core/documents";
 
 export const genereteAccessTokenAndRefreshToken = async(userId)=> {
     try {
@@ -45,8 +47,18 @@ export const createUserService = async (userData) => {
 
     const userCreated = await User.findById(user._id)
         .select("-password -refreshToken");
-    console.log("user created successfully",userCreated);    
-
+    console.log("user created successfully",userCreated);
+    
+    const vectorStore = await getVectorStore();
+    await vectorStore.addDocuments([
+        new Document({
+            pageContent:userCreated,
+            metadata:{
+                source:"User-Data",
+                userId:userCreated._id.toString()
+            },
+        }),
+    ]);
     return userCreated;
 };
 

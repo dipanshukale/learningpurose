@@ -3,9 +3,9 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const model = new ChatGroq({
+const agent = new ChatGroq({
   apiKey: process.env.GROQ_API_KEY,
-  model: "llama-3.3-70b-versatile",
-  temperature: 0,
+  model: "llama-3.1-8b-instant",
 });
-export default model;
+
+export default agent;

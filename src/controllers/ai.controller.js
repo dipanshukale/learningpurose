@@ -5,10 +5,10 @@ import { globlStore } from "../utils/globalData.js";
 
 export const chatwithAi = asyncHandler(async (req,res) => {
 
-    const { message } = req.body;
-    console.log(`user message: ${message}`);
+    const { question } = req.body;
+    console.log(`user message: ${question}`);
 
-    const reply = await generateAiReply(message);
+    const reply = await generateAiReply(question);
 
     globlStore.lastData = reply;
 

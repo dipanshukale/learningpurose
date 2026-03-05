@@ -1,5 +1,7 @@
 import Restaurant from "../models/restaurant.model.js";
 import ApiError from "../utils/ApiError.js";
+import { getVectorStore } from "./vector.service.js";
+import { Document } from "@langchain/core/documents";
 
 export const createRestaurantService = async(data) => {
 
@@ -30,6 +32,23 @@ export const createRestaurantService = async(data) => {
 
     const restaurant = await Restaurant.create(data);
     console.log(restaurant);
-    return restaurant;
 
+
+    const content = `
+        Name: ${restaurant.name}
+        Phone: ${restaurant.phone}
+        Address: ${restaurant.address}
+        Description: ${restaurant.description}
+    `;
+
+    const vectorStore = await getVectorStore();
+    await vectorStore.addDocuments([
+        new Document({
+            pageContent:content,
+            metadata:{restaurantId:restaurant._id.toString()}
+        }),
+    ]);
+    console.log(vectorStore);
+    return restaurant;
 };
+

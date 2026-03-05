@@ -1,66 +1,33 @@
-import groq from "../utils/groqClient.js";
-import ApiError from "../utils/ApiError.js";
-import { findRestaurantInfo } from "../config/restaurant.config.js";
+import agent from "../utils/ai.agent.js";
+import { getVectorStore } from "./vector.service.js";
 
-export const generateAiReply = async (message) => {
-  //check is message valid
-  if (!message) {
-    throw new ApiError(400, "message is required");
+export const generateAiReply = async (question) => {
+  if (!question) {
+    throw new Error("Question is required");
   }
 
-  const restaurantInfo = await findRestaurantInfo();
-  const modelName = "Welcome to Spice Garden Personal Assitant";
+  const vectorStore = await getVectorStore();
+  console.log(`here is the vectore store data from vector db after storing the document`);
+  console.log(vectorStore);
+  const retriver = vectorStore.asRetriever();
+  console.log("data after retriving from vectore store");
+  console.log(retriver);
+  const docResult = await retriver._getRelevantDocuments(question);
+  console.log(`Here we got our similar data output based on the our search and is that exact ? check here ${docResult.toString()}`);
 
-  const completion = await groq.chat.completions.create({
-    model: "llama-3.1-8b-instant",
-    messages: [
-      {
-        role: "system",
-        content: `
-            You are "${modelName}", the official AI assistant of this restaurant website.
+  const context = docResult.map(doc => doc.pageContent).join("\n");
 
-            IMPORTANT RULES:
-            - ONLY answer using the restaurant data provided below.
-            - DO NOT add, assume, guess, or generate any extra information.
-            - If the requested information is not present in the data, reply: "Not available".
-            - DO NOT use outside knowledge.
-            - DO NOT provide related or similar information.
-            - Answers must strictly match the provided restaurant data.
+  const response = await agent.invoke(`
+    You are an Dipanshu Kale personal AI assistant.
+    Answer ONLY using the provided context.
+    If answer not found, say you don't know.
 
-            You can answer ONLY about:
-            - Restaurant details
-            - Menu
-            - Location
-            - Opening hours
-            - Contact details
-            - Services
+    Context:
+    ${context}
 
-            Restaurant Data:
-            ${restaurantInfo}
+    Question:
+    ${question}
+  `);
 
-            If the user asks anything outside restaurant information, respond:
-            "I am Spice Garden personal assistant and can only answer questions about Spice Garden and its services."
-
-            Always introduce yourself as:
-            "${modelName}"
-            `,
-      },
-      {
-        role: "user",
-        content: message,
-      },
-    ],
-  });
-
-  //   console.log(
-  //     `here is your response from your ai model : ${completion.choices[0].message.content}`
-  //   );
-
-  // console.log(completion);
-  const response = completion.choices[0].message.content;
-
-  return {
-    model: modelName,
-    response,
-  };
+  return response.content;
 };
