@@ -36,6 +36,7 @@ export const createRestaurantService = async(data) => {
 
     const content = `
         Name: ${restaurant.name}
+        email:${restaurant.email}
         Phone: ${restaurant.phone}
         Address: ${restaurant.address}
         Description: ${restaurant.description}
