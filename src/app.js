@@ -9,8 +9,8 @@ const app = express();
 dotenv.config();
 
 const allowedOrigins = [
-  "https://agent-ui-alpha-blond.vercel.app",
-  "http://localhost:5173"
+  process.env.FRONTEND_URL,
+  process.env.LOCAL_URL
 ];
 
 const corsOptions = {
