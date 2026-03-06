@@ -2,13 +2,27 @@ import express from "express";
 import cors from "cors";
 import indexRoute from "../src/routes/index.route.js"
 import errorHandler from "./middlewares/error.middleware.js";
+import dotenv from "dotenv";
 
 const app = express();
 
+dotenv.config();
+
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  "http://localhost:5173"
+];
+
 const corsOptions = {
-  origin: "http://localhost:5173", // allow only frontend
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("CORS not allowed"));
+    }
+  },
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-  credentials: true, // allow cookies/auth headers
+  credentials: true,
   allowedHeaders: ["Content-Type", "Authorization"],
 };
 
