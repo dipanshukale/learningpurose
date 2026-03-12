@@ -9,5 +9,4 @@ router.use("/ai",aiRoute);
 router.use("/restaurant",restaurantRoute);
 router.use("/user",userRoute);
 
-
 export default router;

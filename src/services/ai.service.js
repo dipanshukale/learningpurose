@@ -1,33 +1,22 @@
-import agent from "../utils/ai.agent.js";
+import agent from "../utils/tool.agent.js";
 import { getVectorStore } from "./vector.service.js";
 
 export const generateAiReply = async (question) => {
-  if (!question) {
-    throw new Error("Question is required");
-  }
 
   const vectorStore = await getVectorStore();
-  console.log(`here is the vectore store data from vector db after storing the document`);
-  console.log(vectorStore);
-  const retriver = vectorStore.asRetriever();
-  console.log("data after retriving from vectore store");
-  console.log(retriver);
-  const docResult = await retriver._getRelevantDocuments(question);
-  console.log(`Here we got our similar data output based on the our search and is that exact ? check here ${docResult.toString()}`);
+  const retriever = vectorStore.asRetriever();
 
-  const context = docResult.map(doc => doc.pageContent).join("\n");
+  const docs = await retriever.invoke(question);
+  const context = docs.map(d => d.pageContent).join("\n");
 
-  const response = await agent.invoke(`
-    You are an Dipanshu Kale personal AI assistant.
-    Answer ONLY using the provided context.
-    If answer not found, say you don't know.
+  const result = await agent.invoke({
+    messages: [
+      { role: "system", content: `Context:\n${context}` },
+      { role: "user", content: question }
+    ]
+  });
 
-    Context:
-    ${context}
+  const output = JSON.parse(result.messages.at(-1).content);
 
-    Question:
-    ${question}
-  `);
-
-  return response.content;
+  return output.response;
 };
