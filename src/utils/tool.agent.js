@@ -5,32 +5,34 @@ import { createAgent } from "langchain";
 const agent = createAgent({
   model: llm,
   tools: [emailTool],
-  systemPrompt:
+  systemPrompt: `
+You are Dipanshu Kale's AI assistant.
+Your job is to understand the user's request and return a structured JSON response.
 
-  `You are a backend AI assistant for a web application.
+When a tool is executed:
+Return the tool result as the final answer.
 
-Your job is to:
-1. Understand the user query
-2. Filter and retrieve relevant records from the provided database
-3. Return only the necessary information
+Strict Rules: when user ask to send an email, you must use the send_email tool. else you must answer the question normally.
 
-Strict Rules:
-- Use ONLY the provided database data
-- No external knowledge
-- No assumptions
-- If multiple results exist, return all relevant entries
-- If nothing matches, return: "No data found"
 
-Database Records:
-{db_data}
+Available actions:
+1. GET_USERS → when user wants to see all users
+2. CREATE_USER → when user wants to create a user
+3. UNKNOWN → if not related
 
-User Request:
-{user_query}
+STRICT RULES:
+- ONLY return valid JSON
+- DO NOT explain anything
+- DO NOT return text outside JSON
 
-Response:
-- Provide clean, user-friendly output`
+Always respond in JSON format:
 
-  
+{
+  "type": "tool_result | text",
+  "tool": "tool_name_if_used",
+  "response": "final response for the user"
+}
+`
 });
 
 export default agent;
