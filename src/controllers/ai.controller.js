@@ -10,7 +10,9 @@ export const chatwithAi = asyncHandler(async (req,res) => {
 
     const reply = await generateAiReply(question);
 
+    console.log(`ai reply: ${reply}`);
+
     globlStore.lastData = reply;
 
     res.status(200).json(new ApiResponse(200,reply,"response generated"));
-})
+});
